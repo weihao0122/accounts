@@ -1,32 +1,72 @@
-const path = require('path');
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
-const shortid = require('shortid');
 var express = require('express');
 var router = express.Router();
-// 指定 db.json 路径
-const adapter = new FileSync(path.join(__dirname, '../data/db.json'));
+//导入 lowdb
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+const adapter = new FileSync(__dirname + '/../data/db.json');
+//获取 db 对象
 const db = low(adapter);
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+//导入 shortid
+const shortid = require('shortid');
+//导入 moment
+const moment = require('moment');
+const AccountModel = require('../models/AccountModel');
+
+//测试
+// console.log(moment('2023-02-24').toDate())
+//格式化日期对象
+// console.log(moment(new Date()).format('YYYY-MM-DD'));
+
+//记账本的列表
+router.get('/account', function(req, res, next) {
+  //获取所有的账单信息
+  // let accounts = db.get('accounts').value();
+  //读取集合信息
+  AccountModel.find().sort({time: -1}).exec((err, data) => {
+    if(err){
+      res.status(500).send('读取失败~~~');
+      return;
+    }
+    //响应成功的提示
+    res.render('list', {accounts: data, moment: moment});
+  })
 });
-//记账本列表
-router.get('/account',(req,res)=>{
-  
-  //res.send('账本的列表');
-  res.render('list');
-});
-//添加记录页面
-router.get('/account/create',(req,res)=>{
-  // res.send('添加记录');
+
+//添加记录
+router.get('/account/create', function(req, res, next) {
   res.render('create');
 });
 
+//新增记录
 router.post('/account', (req, res) => {
-  // 生成唯一ID
-  const id = shortid.generate();
-  console.log(req.body); // 打印表单提交的数据
-  res.send('添加记录保存');
+  //插入数据库
+  AccountModel.create({
+    ...req.body,
+    //修改 time 属性的值
+    time: moment(req.body.time).toDate()
+  }, (err, data) => {
+    if(err){
+      res.status(500).send('插入失败~~');
+      return
+    }
+    //成功提醒
+    res.render('success', {msg: '添加成功哦~~~', url: '/account'});
+  })
 });
+
+//删除记录
+router.get('/account/:id', (req, res) => {
+  //获取 params 的 id 参数
+  let id = req.params.id;
+  //删除
+  AccountModel.deleteOne({_id: id}, (err, data) => {
+    if(err) {
+      res.status(500).send('删除失败~');
+      return;
+    }
+    //提醒
+    res.render('success', {msg: '删除成功~~~', url: '/account'});
+  })
+});
+
 module.exports = router;
