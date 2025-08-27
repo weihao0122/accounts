@@ -1,27 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>提醒</title>
-  <link
-      href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css"
-      rel="stylesheet"
-    />
+  <title>操作成功 - 记账本</title>
   <style>
-    .h-50{
-      height: 50px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .success-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 60px 40px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .success-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      animation: bounce 1s ease-in-out;
+    }
+
+    .success-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 16px;
+    }
+
+    .success-message {
+      font-size: 16px;
+      color: #718096;
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      color: white;
+      text-decoration: none;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .auto-redirect {
+      margin-top: 24px;
+      font-size: 14px;
+      color: #a0aec0;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .success-container {
+        padding: 40px 20px;
+        margin: 20px;
+      }
+
+      .success-icon {
+        font-size: 48px;
+      }
+
+      .success-title {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="h-50"></div>
-    <div class="alert alert-success" role="alert">
-      <h1>:) <%= msg %></h1>
-      <p><a href="<%= url %>">点击跳转</a></p>
+  <div class="success-container">
+    <div class="success-icon">🎉</div>
+    <h1 class="success-title">操作成功！</h1>
+    <p class="success-message"><%= msg %></p>
+    <a href="<%= url %>" class="btn">
+      🚀 继续
+    </a>
+    <div class="auto-redirect">
+      页面将在 <span id="countdown">3</span> 秒后自动跳转
     </div>
   </div>
+
+  <script>
+    // 自动跳转倒计时
+    let countdown = 3;
+    const countdownElement = document.getElementById('countdown');
+    const url = '<%= url %>';
+    
+    const timer = setInterval(() => {
+      countdown--;
+      countdownElement.textContent = countdown;
+      
+      if (countdown <= 0) {
+        clearInterval(timer);
+        window.location.href = url;
+      }
+    }, 1000);
+  </script>
 </body>
 </html>

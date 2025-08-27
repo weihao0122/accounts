@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>账单详情</title>
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css"
+      rel="stylesheet"
+    />
+    <style>
+      .detail-item {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+      .detail-label {
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 5px;
+      }
+      .detail-value {
+        font-size: 16px;
+        color: #333;
+      }
+      .type-income {
+        color: #5cb85c;
+        font-weight: bold;
+      }
+      .type-expense {
+        color: #d9534f;
+        font-weight: bold;
+      }
+      .amount {
+        font-size: 24px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-lg-8 col-lg-offset-2">
+          <div class="page-header">
+            <h2>账单详情 
+              <small>
+                <span class="label <%= account.type === -1 ? 'label-danger' : 'label-success' %>">
+                  <%= account.type === -1 ? '支出' : '收入' %>
+                </span>
+              </small>
+            </h2>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-label">事项</div>
+            <div class="detail-value"><%= account.title %></div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-label">金额</div>
+            <div class="detail-value amount <%= account.type === -1 ? 'type-expense' : 'type-income' %>">
+              <%= account.type === -1 ? '-' : '+' %><%= account.account %> 元
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-label">类型</div>
+            <div class="detail-value">
+              <span class="label <%= account.type === -1 ? 'label-warning' : 'label-success' %>">
+                <%= account.type === -1 ? '支出' : '收入' %>
+              </span>
+            </div>
+          </div>
+          
+          <div class="detail-item">
+            <div class="detail-label">时间</div>
+            <div class="detail-value">
+              <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+              <%= moment(account.time).format('YYYY年MM月DD日') %>
+            </div>
+          </div>
+          
+          <% if(account.remarks && account.remarks.trim()) { %>
+          <div class="detail-item">
+            <div class="detail-label">备注</div>
+            <div class="detail-value"><%= account.remarks %></div>
+          </div>
+          <% } %>
+          
+          <div class="detail-item">
+            <div class="detail-label">账单ID</div>
+            <div class="detail-value"><code><%= account._id %></code></div>
+          </div>
+          
+          <hr>
+          
+          <div class="btn-group btn-group-justified" role="group">
+            <a href="/api/account/list" class="btn btn-default">
+              <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+              返回列表
+            </a>
+            <a href="/api/account/edit/<%= account._id %>" class="btn btn-primary">
+              <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+              编辑
+            </a>
+            <a href="/api/account/<%= account._id %>" class="btn btn-danger delBtn">
+              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+              删除
+            </a>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script>
+      // 删除确认
+      $('.delBtn').click(function(e) {
+        if (!confirm('您确定要删除这个账单吗？')) {
+          e.preventDefault();
+        }
+      });
+    </script>
+  </body>
+</html> 
