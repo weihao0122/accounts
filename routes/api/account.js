@@ -4,9 +4,10 @@ var router = express.Router();
 // 保留 Mongoose 和 moment
 const moment = require('moment');
 const AccountModel = require('../../models/AccountModel');
+const { authenticateJWT_API } = require('../../middleware/auth');
 
 // 账本列表 - JSON API格式
-router.get('/', function(req, res, next) {
+router.get('/', authenticateJWT_API, function(req, res, next) {
   AccountModel.find().sort({time: -1}).exec((err, data) => {
     if(err){
       res.json({
@@ -25,7 +26,7 @@ router.get('/', function(req, res, next) {
 });
 
 // 新增记录 - JSON API格式
-router.post('/', (req, res) => {
+router.post('/', authenticateJWT_API, (req, res) => {
   AccountModel.create({
     ...req.body,
     time: moment(req.body.time).toDate()
@@ -49,7 +50,7 @@ router.post('/', (req, res) => {
 });
 
 // 获取单个账单 - JSON API格式
-router.get('/detail/:id', (req, res) => {
+router.get('/detail/:id', authenticateJWT_API, (req, res) => {
   let id = req.params.id;
   AccountModel.findById(id, (err, data) => {
     if(err) {
@@ -77,7 +78,7 @@ router.get('/detail/:id', (req, res) => {
 });
 
 // 更新账单 - JSON API格式
-router.put('/:id', (req, res) => {
+router.put('/:id', authenticateJWT_API, (req, res) => {
   let id = req.params.id;
   AccountModel.updateOne({_id: id}, {
     ...req.body,
@@ -108,7 +109,7 @@ router.put('/:id', (req, res) => {
 });
 
 // 删除记录 - JSON API格式
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authenticateJWT_API, (req, res) => {
   let id = req.params.id;
   AccountModel.deleteOne({_id: id}, (err, data) => {
     if(err) {

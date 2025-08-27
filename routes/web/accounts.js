@@ -2,17 +2,10 @@ var express = require('express');
 var router = express.Router();
 const moment = require('moment');
 const AccountModel = require('../../models/AccountModel');
-
-// 中间件：检查登录状态
-function checkAuth(req, res, next) {
-  if(!req.session.username) {
-    return res.redirect('/auth/login');
-  }
-  next();
-}
+const { authenticateJWT } = require('../../middleware/auth');
 
 // 账本列表页面
-router.get('/', checkAuth, function(req, res, next) {
+router.get('/', authenticateJWT, function(req, res, next) {
   AccountModel.find().sort({time: -1}).exec((err, data) => {
     if(err){
       res.status(500).send('读取失败~~~');
@@ -23,12 +16,12 @@ router.get('/', checkAuth, function(req, res, next) {
 });
 
 // 添加记录页面
-router.get('/create', checkAuth, function(req, res, next) {
+router.get('/create', authenticateJWT, function(req, res, next) {
   res.render('create');
 });
 
 // 编辑账单页面
-router.get('/edit/:id', checkAuth, function(req, res, next) {
+router.get('/edit/:id', authenticateJWT, function(req, res, next) {
   let id = req.params.id;
   AccountModel.findById(id, (err, data) => {
     if(err || !data) {
@@ -40,7 +33,7 @@ router.get('/edit/:id', checkAuth, function(req, res, next) {
 });
 
 // 查看账单详情页面
-router.get('/view/:id', checkAuth, function(req, res, next) {
+router.get('/view/:id', authenticateJWT, function(req, res, next) {
   let id = req.params.id;
   AccountModel.findById(id, (err, data) => {
     if(err || !data) {
@@ -52,7 +45,7 @@ router.get('/view/:id', checkAuth, function(req, res, next) {
 });
 
 // 更新账单 - 页面功能 (POST方式)
-router.post('/edit/:id', checkAuth, (req, res) => {
+router.post('/edit/:id', authenticateJWT, (req, res) => {
   let id = req.params.id;
   AccountModel.updateOne({_id: id}, {
     ...req.body,
@@ -71,7 +64,7 @@ router.post('/edit/:id', checkAuth, (req, res) => {
 });
 
 // 新增记录 - 页面功能 (POST方式)
-router.post('/create', checkAuth, (req, res) => {
+router.post('/create', authenticateJWT, (req, res) => {
   AccountModel.create({
     ...req.body,
     time: moment(req.body.time).toDate()
@@ -85,7 +78,7 @@ router.post('/create', checkAuth, (req, res) => {
 });
 
 // 删除记录 - 页面功能 (GET方式)
-router.get('/delete/:id', checkAuth, (req, res) => {
+router.get('/delete/:id', authenticateJWT, (req, res) => {
   let id = req.params.id;
   AccountModel.deleteOne({_id: id}, (err, data) => {
     if(err) {
